@@ -102,7 +102,11 @@ class NeuralNetwork:
             Z_curr: ArrayLike
                 Current layer linear transformed matrix.
         """
-        pass
+
+        Z_curr = np.dot(W_curr, A_prev.transpose()) + b #May break if observations are indexed by columns
+        A_curr = self._activation_function(Z_curr, type=activation)
+        return A_curr, Z_curr
+
 
     def forward(self, X: ArrayLike) -> Tuple[ArrayLike, Dict[str, ArrayLike]]:
         """
@@ -227,6 +231,29 @@ class NeuralNetwork:
         """
         pass
 
+    def _activation_function(self, Z: ArrayLike, type: str) -> ArrayLike:
+        """
+        Applies activation function to input Z array.
+
+        Args:
+            Z: ArrayLike
+                Output of layer linear transform.
+
+            type: str
+                Type of activation function (either sigmoid or relu)
+
+        Returns:
+            Activation function output
+        """
+
+        if type == 'sigmoid':
+            A = self._sigmoid(Z)
+
+        elif type == 'relu':
+            A = self._relu(Z)
+
+        return A
+
     def _sigmoid(self, Z: ArrayLike) -> ArrayLike:
         """
         Sigmoid activation function.
@@ -239,7 +266,7 @@ class NeuralNetwork:
             nl_transform: ArrayLike
                 Activation function output.
         """
-        pass
+        return 1 / (1 + np.exp(-x))
 
     def _relu(self, Z: ArrayLike) -> ArrayLike:
         """
@@ -253,7 +280,16 @@ class NeuralNetwork:
             nl_transform: ArrayLike
                 Activation function output.
         """
-        pass
+        A = np.zeros(len(Z))
+
+        for i in range(0,len(Z)):
+            if Z[i] >= 0:
+                A[i] == Z[i]
+
+            elif Z[i] < 0:
+                A[i] == 0.01 * Z[i]
+        return A
+
 
     def _sigmoid_backprop(self, dA: ArrayLike, Z: ArrayLike):
         """
