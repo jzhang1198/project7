@@ -177,6 +177,10 @@ class NeuralNetwork:
             db_curr: ArrayLike
                 Partial derivative of loss function with respect to current layer bias matrix.
         """
+
+
+
+
         pass
 
     def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]):
@@ -326,6 +330,8 @@ class NeuralNetwork:
             dZ: ArrayLike
                 Partial derivative of current layer Z matrix.
         """
+
+
         pass
 
     def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
@@ -358,7 +364,19 @@ class NeuralNetwork:
             loss: float
                 Average loss over mini-batch.
         """
-        pass
+
+        loss = 0
+        for i in range(0,len(y)):
+
+            if y_hat[i] == 1: #make sure y_hat values are between 0 and 1
+                y_hat[i] = .9999999999
+
+            elif y_hat[i] == 0:
+                y_hat[i] = 0.0000000001
+
+            loss += ((y[i]*np.log(y_hat[i])) + ((1 - y[i])*np.log(1 - y_hat[i])))
+
+        return -1 * loss / len(y)
 
     def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
