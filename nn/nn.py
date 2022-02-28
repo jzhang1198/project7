@@ -78,8 +78,7 @@ class NeuralNetwork:
             param_dict['b' + str(layer_idx)] = np.random.randn(output_dim, 1) * 0.1
         return param_dict
 
-    def _single_forward(self,
-                        W_curr: ArrayLike,
+    def _single_forward(self, W_curr: ArrayLike,
                         b_curr: ArrayLike,
                         A_prev: ArrayLike,
                         activation: str) -> Tuple[ArrayLike, ArrayLike]:
@@ -103,9 +102,9 @@ class NeuralNetwork:
                 Current layer linear transformed matrix.
         """
 
-        Z_curr = np.dot(W_curr, A_prev.transpose()) + b #May break if observations are indexed by columns
+        Z_curr = np.dot(W_curr, A_prev.transpose()) + np.tile(b_curr,(A_prev.shape[0],1)).transpose()
         A_curr = self._activation_function(Z_curr, type=activation)
-        return A_curr, Z_curr
+        return Z_curr, A_curr
 
 
     def forward(self, X: ArrayLike) -> Tuple[ArrayLike, Dict[str, ArrayLike]]:
@@ -122,7 +121,29 @@ class NeuralNetwork:
             cache: Dict[str, ArrayLike]:
                 Dictionary storing Z and A matrices from `_single_forward` for use in backprop.
         """
-        pass
+
+        cache = {}
+
+        W0 = self._param_dict['W1'] #get W and b for layer 1
+        b0 = self._param_dict['b1']
+        Z_prev = np.dot(W0, X.transpose()) + np.tile(b,(X.shape[0],1)).transpose() #compute Z and A for layer 1 (Assumes rows of X are indexed by observations, row i of W correspond to weights for the ith neuron in the next layer)
+        A_prev = self._activation_function(Z_curr,type=self.arch[0]['activation'])
+        cache['layer1'] = (Z_prev,A_prev) #add Z and A from layer 1 to cache
+
+        for for i in range(1,len(self.arch)):
+            act_func_type = self.arch[i]['activation'] #get W, b, and the activation function type for layer i+1
+            W_curr = self._param_dict['W' + str(i+1)]
+            b_curr = self._param_dict['b' + str(i+1)]
+
+            Z_curr, A_curr = self._single_forward(W_curr, b_curr, A_prev, act_func_type) #compute Z and A for layer i+1
+            cache['layer' + str(i+2)] = (Z_curr,A_curr) #cache Z and A
+
+            Z_prev = Z_curr #update Z_prev and A_prev for next iteration
+            A_prev = A_curr
+
+        output = A_prev
+
+        return output, cache
 
     def _single_backprop(self,
                          W_curr: ArrayLike,
