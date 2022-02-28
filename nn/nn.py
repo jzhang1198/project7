@@ -315,7 +315,6 @@ class NeuralNetwork:
                 A[i] == 0.01 * Z[i]
         return A
 
-
     def _sigmoid_backprop(self, dA: ArrayLike, Z: ArrayLike):
         """
         Sigmoid derivative for backprop.
@@ -408,7 +407,10 @@ class NeuralNetwork:
             loss: float
                 Average loss of mini-batch.
         """
-        pass
+
+        mse = np.sum(np.square(y - y_hat)) / len(y)
+        
+        return mse
 
     def _mean_squared_error_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
