@@ -171,19 +171,7 @@ class NeuralNetwork:
                 Partial derivative of loss function with respect to current layer bias matrix.
         """
 
-        if activation_curr == 'sigmoid':
 
-            #compute dAl/dZ
-            dAl_dZ = self._sigmoid_backprop()
-
-            dA_prev =
-
-
-            dW_curr = dA_curr * W_curr.transpose() * self._sigmoid_backprop(Z_curr) * A_prev
-            pass
-
-        elif activation_curr == 'relu':
-            pass
 
 
 
@@ -337,9 +325,7 @@ class NeuralNetwork:
         """
 
         dZ = self._sigmoid(Z) * (1 - self._sigmoid(Z))
-
-
-        pass
+        return dZ
 
     def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
         """
