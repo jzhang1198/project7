@@ -249,7 +249,7 @@ class NeuralNetwork:
             current_weights = self._param_dict[key]
             self._param_dict[key] = current_weights - self._lr * grad #update weights
 
-        return 
+        return
 
     def fit(self,
             X_train: ArrayLike,
