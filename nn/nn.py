@@ -124,6 +124,7 @@ class NeuralNetwork:
         cache = {}
 
         A_prev = X
+        cache['A0'] = A_prev
         for i in range(0,len(self.arch)):
             act_func_type = self.arch[i]['activation'] #get W, b, and the activation function type for layer i+1
             W_curr = self._param_dict['W' + str(i+1)]
@@ -172,15 +173,16 @@ class NeuralNetwork:
                 Partial derivative of loss function with respect to current layer bias matrix.
         """
 
-        dA_prev = np.dot(W_curr.transpose(), dA_curr)
-        dZ = self._activation_backprop()
+        dZ = self._activation_backprop(Z_curr, activation_curr) #for layer i, compute derivative of activation function with respect to Zi
+        dA_prev = np.dot(np.dot(W_curr.transpose(), dA_curr), dZ) #for layer i, compute the product of the dJ/dZi+1, dZi+1/dAi, and dAi/dZi
 
-        dW_curr = np.dot(dA_prev, A_prev.transpose())
+        #compute gradients for biases and weights
         db_curr = dA_prev
+        dW_curr = np.dot(dA_prev, A_prev.transpose())
 
         return dA_prev, dW_curr, db_curr
 
-    def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]):
+    def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike], loss: str):
         """
         This method is responsible for the backprop of the whole fully connected neural network.
 
@@ -192,20 +194,41 @@ class NeuralNetwork:
             cache: Dict[str, ArrayLike]
                 Dictionary containing the information about the
                 most recent forward pass, specifically A and Z matrices.
+            loss: str
+                Type of loss function to be used.
 
         Returns:
             grad_dict: Dict[str, ArrayLike]
                 Dictionary containing the gradient information from this pass of backprop.
         """
 
-        activation_L = self.arch[-1]['activation']
-        if activation_L == 'sigmoid':
-            dJ =
+        grad_dict = {}
 
+        #compute the gradients for layer L
+        activation_curr = self.arch[-1]['activation']
+        dA_curr = np.dot(self._loss_backprop(y, y_hat, loss), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
+        dW_L = cache['A' + str(len(self.arch)-1)]
 
-        dA_curr = f#backprop starting from layer L
+        #update grad_dict
+        grad_dict['dW' + str(len(self.arch))] = np.dot(dA_prev, dW_L.transpose())
+        grad_dict['db' + str(len(self.arch))] = dA_curr
 
-        pass
+        for i in range(0,len(self.arch)-1)[::-1]:
+            activation_curr = self.arch[i]['activation']
+            W_curr = self._param_dict['W' + str(i+1)]
+            b_curr = self._param_dict['b' + str(i+1)]
+            Z_curr = cache['Z' + str(i+1)]
+            A_prev = cache['A' + str(i)]
+
+            #compute gradients
+            dA_prev, dW_curr, db_curr = self._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, activation_curr)
+
+            #update grad_dict and dA_curr
+            grad_dict['dW' + str(i+1)] = dW_curr
+            grad_dict['db' + str(i+1)] = db_curr
+            dA_curr = dA_prev
+
+        return grad_dict 
 
     def _update_params(self, grad_dict: Dict[str, ArrayLike]):
         """
@@ -321,13 +344,11 @@ class NeuralNetwork:
                 A[i] == 0.01 * Z[i]
         return A
 
-    def _activation_backprop(self, dA: ArrayLike, Z: ArrayLike, activation: str) -> ArrayLike:
+    def _activation_backprop(self, Z: ArrayLike, activation: str) -> ArrayLike:
         """
         Applies derivative of activation function to an input A array.
 
         Args:
-            dA: ArrayLike
-                Partial derivative of previous layer activation matrix.
             Z: ArrayLike
                 Output of layer linear transform
             activation: str
@@ -339,20 +360,18 @@ class NeuralNetwork:
         """
 
         if activation == 'sigmoid':
-            dZ = self._sigmoid_backprop(dA,Z)
+            dZ = self._sigmoid_backprop(Z)
 
         elif activation == 'relu':
-            dZ = self._relu_backprop(dA,Z)
+            dZ = self._relu_backprop(Z)
 
         return dZ
 
-    def _sigmoid_backprop(self, dA: ArrayLike, Z: ArrayLike):
+    def _sigmoid_backprop(self, Z: ArrayLike):
         """
         Sigmoid derivative for backprop.
 
         Args:
-            dA: ArrayLike
-                Partial derivative of previous layer activation matrix.
             Z: ArrayLike
                 Output of layer linear transform.
 
@@ -360,7 +379,6 @@ class NeuralNetwork:
             dZ: ArrayLike
                 Partial derivative of current layer Z matrix.
         """
-
 
         dZ = self._sigmoid(Z) * (1 - self._sigmoid(Z))
 
@@ -371,8 +389,6 @@ class NeuralNetwork:
         ReLU derivative for backprop.
 
         Args:
-            dA: ArrayLike
-                Partial derivative of previous layer activation matrix.
             Z: ArrayLike
                 Output of layer linear transform.
 
