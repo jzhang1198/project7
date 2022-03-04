@@ -182,7 +182,7 @@ class NeuralNetwork:
 
         return dA_prev, dW_curr, db_curr
 
-    def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike], loss: str):
+    def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]):
         """
         This method is responsible for the backprop of the whole fully connected neural network.
 
@@ -194,8 +194,6 @@ class NeuralNetwork:
             cache: Dict[str, ArrayLike]
                 Dictionary containing the information about the
                 most recent forward pass, specifically A and Z matrices.
-            loss: str
-                Type of loss function to be used.
 
         Returns:
             grad_dict: Dict[str, ArrayLike]
@@ -207,7 +205,7 @@ class NeuralNetwork:
         #compute the gradients for layer L
         activation_curr = self.arch[-1]['activation']
         Z_curr = cache['Z' + str(len(self.arch))]
-        dA_curr = np.multiply(self._loss_backprop(y, y_hat, loss), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
+        dA_curr = np.multiply(self._loss_backprop(y, y_hat, self._loss_func), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
         dW_L = cache['A' + str(len(self.arch)-1)]
 
         #update grad_dict
@@ -246,7 +244,7 @@ class NeuralNetwork:
 
         for key in grad_dict:
             grad = grad_dict[key] #get gradient and current weights
-            current_weights = self._param_dict[key]
+            current_weights = self._param_dict[key[1:]]
             self._param_dict[key] = current_weights - self._lr * grad #update weights
 
         return
