@@ -103,7 +103,7 @@ class NeuralNetwork:
         """
 
         Z_curr = np.dot(W_curr, A_prev) + b_curr
-        A_curr = self._activation_function(Z_curr, type=activation)
+        A_curr = self._activation_function(Z_curr, activation)
         return Z_curr, A_curr
 
     def forward(self, X: ArrayLike) -> Tuple[ArrayLike, Dict[str, ArrayLike]]:
@@ -228,7 +228,7 @@ class NeuralNetwork:
             delta_curr = self._compute_delta(W_curr, delta_prev, Z_curr, activation_curr) #compute delta
 
             #compute gradients
-            dW_curr, db_curr = self._single_backprop(delta_curr, A_prev, dA_curr)
+            dW_curr, db_curr = self._single_backprop(delta_curr, A_prev)
 
             #update grad_dict and delta
             grad_dict['dW' + str(i+1)] = dW_curr
@@ -281,7 +281,42 @@ class NeuralNetwork:
             per_epoch_loss_val: List[float]
                 List of per epoch loss for validation set.
         """
-        pass
+        epochs = 0
+        per_epoch_loss_train = []
+        per_epoch_loss_val = []
+
+        while epochs <= self._epochs:
+            epochs += 1
+
+            #Shuffle training set
+            shuffled_indices = np.linspace(0, X_train.shape[1]-1, X_train.shape[1])
+            np.random.shuffle(shuffled_indices)
+            X_train = np.array([X_train[:, int(i)] for i in shuffled_indices])
+            y_train = np.array([y_train[:, int(i)] for i in shuffled_indices])
+
+            #Split training set into batches
+            num_batches = int(X_train.shape[1]/self._batch_size) + 1
+            X_batch = [i.T for i in np.array_split(X_train.T, num_batches)]
+            y_batch = [i.T for i in np.array_split(y_train, num_batches)]
+
+            #Generate empty lists to hold losses for batches
+            training_losses = []
+            validation_losses = []
+
+            for X_train, y_train in zip(X_batch, y_batch):
+                training_output, training_cache = self.forward(X_batch) #forward pass of training and validation set
+                val_output, val_cache = self.forward(X_val)
+
+                training_losses.append(self._loss_function(y_train, training_output, self._loss_func)) #record training and validation losses
+                validation_losses.append(self._loss_function(y_val, val_output))
+
+                grad_dict = backprop(y_train, training_output) #backward pass
+                self._update_params(grad_dict) #update weights and biases
+
+            per_epoch_loss_train.append(np.mean(np.array(training_losses)))
+            per_epoch_loss_val.append(np.mean(np.array(validation_losses)))
+
+
 
     def predict(self, X: ArrayLike) -> ArrayLike:
         """
@@ -295,7 +330,9 @@ class NeuralNetwork:
             y_hat: ArrayLike
                 Prediction from the model.
         """
-        pass
+        y_hat, _ = self.forward(X)
+
+        return y_hat
 
     def _activation_function(self, Z: ArrayLike, activation: str) -> ArrayLike:
         """
@@ -410,7 +447,32 @@ class NeuralNetwork:
         """
         pass
 
-    def _loss_backprop(self, y: ArrayLike, y_hat: ArrayLike, loss_fun = str) -> ArrayLike:
+    def _loss_function(self, y: ArrayLike, y_hat: ArrayLike, loss_fun: str) -> float:
+        """
+        Wrapper function for loss functions.
+
+        Args:
+            y: ArrayLike
+                Ground truth labels for data.
+            y_hat: ArrayLike
+                Model predictions for labels.
+            loss_fun: str
+                Type of loss function (bce, mse, or name of user defined loss function)
+
+        Returns:
+            loss: float
+                The loss.
+        """
+
+        if loss_fun == 'bce':
+            loss = self._binary_cross_entropy(y, y_hat)
+
+        elif loss_fun == 'mse':
+            loss = self._mean_squared_error(y, y_hat)
+
+        return loss
+
+    def _loss_backprop(self, y: ArrayLike, y_hat: ArrayLike, loss_fun: str) -> ArrayLike:
         """
         This function computes dJ/dAL for a given loss function.
         Args:
@@ -506,7 +568,7 @@ class NeuralNetwork:
 
         return dA
 
-    def _loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
+    def _user_loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
         """
         Loss function, computes loss given y_hat and y. This function is
         here for the case where someone would want to write more loss
@@ -524,7 +586,7 @@ class NeuralNetwork:
 
         pass
 
-    def _loss_function_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
+    def _user_loss_function_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
         This function performs the derivative of the loss function with respect
         to the loss itself.
