@@ -160,7 +160,7 @@ class NeuralNetwork:
         """
 
         #compute gradients for biases and weights
-        db_curr = dA_prev
+        db_curr = np.sum(delta_curr, axis=1, keepdims=True)
         dW_curr = np.dot(delta_curr, A_prev.transpose())
         return dW_curr, db_curr
 
@@ -211,11 +211,11 @@ class NeuralNetwork:
         activation_curr = self.arch[-1]['activation']
         Z_curr = cache['Z' + str(len(self.arch))]
         delta_L = np.multiply(self._loss_backprop(y, y_hat, self._loss_func), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
-        dW_L = cache['A' + str(len(self.arch)-1)]
+        A_prev = cache['A' + str(len(self.arch)-1)]
 
         #update grad_dict
-        grad_dict['dW' + str(len(self.arch))] = np.dot(dA_curr, dW_L.transpose())
-        grad_dict['db' + str(len(self.arch))] = delta #FIGURE OUT HOW TO GET DIMS CORRECT
+        grad_dict['dW' + str(len(self.arch))] = np.dot(delta_L, A_prev.transpose())
+        grad_dict['db' + str(len(self.arch))] = np.sum(delta_L, axis=1, keepdims=True)
 
         delta_prev = delta_L
         for i in range(0,len(self.arch)-1)[::-1]:
@@ -230,10 +230,10 @@ class NeuralNetwork:
             #compute gradients
             dW_curr, db_curr = self._single_backprop(delta_curr, A_prev, dA_curr)
 
-            #update grad_dict and dA_curr
+            #update grad_dict and delta
             grad_dict['dW' + str(i+1)] = dW_curr
             grad_dict['db' + str(i+1)] = db_curr
-            dA_curr = dA_prev
+            delta_prev = delta_curr
 
         return grad_dict
 
