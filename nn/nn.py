@@ -141,46 +141,51 @@ class NeuralNetwork:
         return output, cache
 
     def _single_backprop(self,
-                         W_curr: ArrayLike,
-                         b_curr: ArrayLike,
-                         Z_curr: ArrayLike,
                          A_prev: ArrayLike,
-                         dA_curr: ArrayLike,
-                         activation_curr: str) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
+                         delta_curr: ArrayLike) -> Tuple[ArrayLike, ArrayLike, ArrayLike]:
         """
         This method is used for a single backprop pass on a single layer.
 
         Args:
-            W_curr: ArrayLike
-                Current layer weight matrix.
-            b_curr: ArrayLike
-                Current layer bias matrix.
-            Z_curr: ArrayLike
-                Current layer linear transform matrix.
             A_prev: ArrayLike
                 Previous layer activation matrix.
-            dA_curr: ArrayLike
-                Partial derivative of loss function with respect to current layer activation matrix.
-            activation_curr: str
-                Name of activation function of layer.
+            delta_curr: ArrayLike
+                Delta for current layer.
 
         Returns:
-            dA_prev: ArrayLike
-                Partial derivative of loss function with respect to previous layer activation matrix.
             dW_curr: ArrayLike
                 Partial derivative of loss function with respect to current layer weight matrix.
             db_curr: ArrayLike
                 Partial derivative of loss function with respect to current layer bias matrix.
         """
 
-        dZ = self._activation_backprop(Z_curr, activation_curr) #for layer i, compute derivative of activation function with respect to Zi
-        dA_prev = np.multiply(np.dot(W_curr.transpose(), dA_curr), dZ) #for layer i, compute the product of the dJ/dZi+1, dZi+1/dAi, and dAi/dZi
-
         #compute gradients for biases and weights
         db_curr = dA_prev
-        dW_curr = np.dot(dA_prev, A_prev.transpose())
+        dW_curr = np.dot(delta_curr, A_prev.transpose())
+        return dW_curr, db_curr
 
-        return dA_prev, dW_curr, db_curr
+    def _compute_delta(self, W_curr: ArrayLike, delta_prev: ArrayLike, Z_curr: ArrayLike, activation_curr: str):
+        """
+        Computes delta, as defined in https://sudeepraja.github.io/Neural/, for the current layer.
+
+        Args:
+            W_curr: ArrayLike
+                Weight matrix for the current layer.
+            delta_prev: ArrayLike
+                Delta quantity from previous layer.
+            Z_curr: ArrayLike
+                Current layer linear transform matrix.
+            activation_curr: str
+                Activation function (sigmoid or relu).
+
+        Returns:
+            delta: ArrayLike
+                Delta quantity for current layer.
+        """
+
+        dZ = self._activation_backprop(Z_curr, activation_curr) #for layer i, compute derivative of activation function with respect to Zi
+        delta = np.multiply(np.dot(W_curr.transpose(), delta_prev), dZ) #for layer i, compute the product of the dJ/dZi+1, dZi+1/dAi, and dAi/dZi
+        return delta
 
     def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]):
         """
@@ -205,13 +210,14 @@ class NeuralNetwork:
         #compute the gradients for layer L
         activation_curr = self.arch[-1]['activation']
         Z_curr = cache['Z' + str(len(self.arch))]
-        dA_curr = np.multiply(self._loss_backprop(y, y_hat, self._loss_func), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
+        delta_L = np.multiply(self._loss_backprop(y, y_hat, self._loss_func), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
         dW_L = cache['A' + str(len(self.arch)-1)]
 
         #update grad_dict
         grad_dict['dW' + str(len(self.arch))] = np.dot(dA_curr, dW_L.transpose())
-        grad_dict['db' + str(len(self.arch))] = dA_curr
+        grad_dict['db' + str(len(self.arch))] = delta #FIGURE OUT HOW TO GET DIMS CORRECT
 
+        delta_prev = delta_L
         for i in range(0,len(self.arch)-1)[::-1]:
             activation_curr = self.arch[i]['activation']
             W_curr = self._param_dict['W' + str(i+2)]
@@ -219,8 +225,10 @@ class NeuralNetwork:
             Z_curr = cache['Z' + str(i+1)]
             A_prev = cache['A' + str(i)]
 
+            delta_curr = self._compute_delta(W_curr, delta_prev, Z_curr, activation_curr) #compute delta
+
             #compute gradients
-            dA_prev, dW_curr, db_curr = self._single_backprop(W_curr, b_curr, Z_curr, A_prev, dA_curr, activation_curr)
+            dW_curr, db_curr = self._single_backprop(delta_curr, A_prev, dA_curr)
 
             #update grad_dict and dA_curr
             grad_dict['dW' + str(i+1)] = dW_curr
