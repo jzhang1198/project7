@@ -228,7 +228,7 @@ class NeuralNetwork:
             grad_dict['db' + str(i+1)] = db_curr
             dA_curr = dA_prev
 
-        return grad_dict 
+        return grad_dict
 
     def _update_params(self, grad_dict: Dict[str, ArrayLike]):
         """
@@ -381,7 +381,6 @@ class NeuralNetwork:
         """
 
         dZ = self._sigmoid(Z) * (1 - self._sigmoid(Z))
-
         return dZ
 
     def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
@@ -413,18 +412,8 @@ class NeuralNetwork:
                 Average loss over mini-batch.
         """
 
-        loss = 0
-        for i in range(0,len(y)):
-
-            if y_hat[i] == 1: #make sure y_hat values are between 0 and 1
-                y_hat[i] = .9999999999
-
-            elif y_hat[i] == 0:
-                y_hat[i] = 0.0000000001
-
-            loss += ((y[i]*np.log(y_hat[i])) + ((1 - y[i])*np.log(1 - y_hat[i])))
-
-        return -1 * loss / len(y)
+        loss = np.sum(np.multiply(y, np.log(y_hat)) + np.multiply(1 - y, np.log(1 - y_hat))) / y.shape[1]
+        return loss
 
     def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
