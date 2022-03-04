@@ -432,6 +432,8 @@ class NeuralNetwork:
 
 
 
+
+
         pass
 
     def _mean_squared_error(self, y: ArrayLike, y_hat: ArrayLike) -> float:
@@ -449,9 +451,9 @@ class NeuralNetwork:
                 Average loss of mini-batch.
         """
 
-        mse = np.sum(np.square(y - y_hat)) / len(y)
+        loss = np.sum(np.square(y - y_hat)) / y.shape[1]
 
-        return mse
+        return loss
 
     def _mean_squared_error_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
         """
