@@ -1,7 +1,7 @@
-BMI 203 Project 7: Neural Network
+#BMI 203 Project 7: Neural Network
 
 
-Importing Dependencies
+#Importing Dependencies
 import numpy as np
 from typing import List, Dict, Tuple, Union
 from numpy.typing import ArrayLike
