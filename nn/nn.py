@@ -493,7 +493,7 @@ class NeuralNetwork:
         if loss_fun == 'bce':
             dA = self._binary_cross_entropy_backprop(y, y_hat)
 
-        elif loss_fun = 'mse':
+        elif loss_fun == 'mse':
             dA = self._mean_squared_error_backprop(y, y_hat)
 
         return dA
