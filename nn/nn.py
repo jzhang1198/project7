@@ -253,7 +253,7 @@ class NeuralNetwork:
         for key in grad_dict:
             grad = grad_dict[key] #get gradient and current weights
             current_weights = self._param_dict[key[1:]]
-            self._param_dict[key] = current_weights - self._lr * grad #update weights
+            self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
 
         return
 
