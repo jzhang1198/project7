@@ -228,7 +228,7 @@ class NeuralNetwork:
             delta_curr = self._compute_delta(W_curr, delta_prev, Z_curr, activation_curr) #compute delta
 
             #compute gradients
-            dW_curr, db_curr = self._single_backprop(delta_curr, A_prev)
+            dW_curr, db_curr = self._single_backprop(A_prev, delta_curr)
 
             #update grad_dict and delta
             grad_dict['dW' + str(i+1)] = dW_curr
