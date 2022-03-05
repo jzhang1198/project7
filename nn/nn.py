@@ -34,7 +34,7 @@ class NeuralNetwork:
             This list of dictionaries describing the fully connected layers of the artificial neural network.
     """
     def __init__(self,
-                 nn_arch: List[Dict[str, Union(int, str)]],
+                 nn_arch,
                  lr: float,
                  seed: int,
                  batch_size: int,
