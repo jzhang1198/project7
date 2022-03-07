@@ -1,6 +1,7 @@
 # BMI 203 Project 7: Neural Network
 
 # Import necessary dependencies here
+import pytest
 from nn import NeuralNetwork
 from numpy.typing import ArrayLike
 from sklearn.datasets import load_digits
