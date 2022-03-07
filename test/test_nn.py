@@ -73,7 +73,7 @@ def test_forward_and_single_forward_and_predict():
         assert W_curr.shape[0] == b_curr.shape[0] #double check that W and b are constructed correctly
 
         Z_curr, A_curr = self._single_forward(W_curr, b_curr, A_prev, act_func_type)
-        assert A_curr.shape = Z_curr.shape #check that dimensions of A and Z are correct
+        assert A_curr.shape == Z_curr.shape #check that dimensions of A and Z are correct
         assert A_curr.shape[1] == X.shape[1] and A_curr.shape[0] == W_curr.shape[0]
 
         #double check that the columns and rows are dotted properly
