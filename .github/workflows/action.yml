@@ -1,0 +1,14 @@
+name: regression
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - run: pip install .
+      - run: pip install matplotlib
+      - run: pip install numpy
+      - run: pip install pandas
+      - run: pip install scikit_learn
+      - run: pip install pytest
+      - run: pytest -v
