@@ -567,9 +567,9 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
 
+        dA = (-2 / (y.shape[0] * y.shape[1]))(y - y_hat)
 
-
-        pass
+        return dA
 
     def _user_loss_function(self, y: ArrayLike, y_hat: ArrayLike) -> float:
         """
