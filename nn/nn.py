@@ -549,7 +549,7 @@ class NeuralNetwork:
                 Average loss of mini-batch.
         """
 
-        loss = np.sum(np.square(y - y_hat)) / y.shape[1]
+        loss = np.sum(np.sum(np.square(y - y_hat), axis=0) / y.shape[0]) / y.shape[1]
         return loss
 
     def _mean_squared_error_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
@@ -566,6 +566,7 @@ class NeuralNetwork:
             dA: ArrayLike
                 partial derivative of loss with respect to A matrix.
         """
+
 
 
         pass

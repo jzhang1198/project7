@@ -52,7 +52,7 @@ def instantiate_nn(lr: float, batch_size: int, epochs: int, loss_function: str):
     seed = 1
     return NeuralNetwork(nn_arch, lr, seed, batch_size, epochs, loss_function)
 
-def test_forward_and_single_forward():
+def test_forward_and_single_forward_and_predict():
     """
     Tests forward pass through the network.
     """
@@ -132,21 +132,14 @@ def test_backprop_and_single_backprop():
         assert grad_dict['dW' + str(i+1)].shape == self._param_dict['W' + str(i+1)].shape #check that the shape of gradients are correct
         assert grad_dict['db' + str(i+1)].shape == self._param_dict['b' + str(i+1)].shape
 
-def test_predict():
-    pass
-
-
 def test_binary_cross_entropy():
     pass
-
 
 def test_binary_cross_entropy_backprop():
     pass
 
-
 def test_mean_squared_error():
     pass
-
 
 def test_mean_squared_error_backprop():
     pass
