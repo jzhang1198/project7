@@ -427,7 +427,7 @@ class NeuralNetwork:
         dZ = self._sigmoid(Z) * (1 - self._sigmoid(Z))
         return dZ
 
-    def _relu_backprop(self, dA: ArrayLike, Z: ArrayLike) -> ArrayLike:
+    def _relu_backprop(self, Z: ArrayLike) -> ArrayLike:
         """
         ReLU derivative for backprop.
 

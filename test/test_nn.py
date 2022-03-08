@@ -82,6 +82,7 @@ def test_forward_and_single_forward_and_predict():
             b = b_curr[j]
             for k in range(0, A_prev.shape[1]):
                 assert np.dot(W_curr[j, :], A_prev[:, k]) + b - Z_curr[j,k] < 10e-8
+    A_prev = A_curr
 
 def test_backprop_and_single_backprop():
     X, y = load_test_data() #load dataset
@@ -100,7 +101,7 @@ def test_backprop_and_single_backprop():
     activation_curr = nn.arch[-1]['activation']
     Z_curr = cache['Z' + str(len(nn.arch))]
     delta_curr = np.multiply(nn._loss_backprop(y, y_hat, nn._loss_func), nn._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
-    assert delta_curr.shape == y.shape and delta_curr.shape == y_hat.shape and delta_curr.shape == Z_curr.shape #check that the shape of delta is correct
+    assert delta_curr.shape == Z_curr.shape #check that the shape of delta is correct
     assert delta_curr.shape[1] == X.shape[1]
 
     A_prev = cache['A' + str(len(nn.arch)-1)]
@@ -111,7 +112,7 @@ def test_backprop_and_single_backprop():
     assert grad_dict['dW' + str(len(nn.arch))].shape == nn._param_dict['W' + str(len(nn.arch))].shape #check that the shapes of gradients are correct
     assert grad_dict['db' + str(len(nn.arch))].shape == nn._param_dict['b' + str(len(nn.arch))].shape
 
-    delta_prev = delta_L
+    delta_prev = delta_curr
     for i in range(0,len(nn.arch)-1)[::-1]:
         activation_curr = nn.arch[i]['activation']
         W_curr = nn._param_dict['W' + str(i+2)]
