@@ -119,7 +119,7 @@ def test_backprop_and_single_backprop():
         b_curr = nn._param_dict['b' + str(i+2)]
         Z_curr = cache['Z' + str(i+1)]
         A_prev = cache['A' + str(i)]
-        assert W_curr.shape[1] == Z_curr.shape[1] #check that the shapes of cached matrices are correct
+        assert W_curr.shape[1] == Z_curr.shape[0] #check that the shapes of cached matrices are correct
         assert b_curr.shape[0] == W_curr.shape[0]
 
         delta_curr = nn._compute_delta(W_curr, delta_prev, Z_curr, activation_curr) #compute delta

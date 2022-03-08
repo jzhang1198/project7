@@ -440,7 +440,7 @@ class NeuralNetwork:
                 Partial derivative of current layer Z matrix.
         """
 
-        dZ = relu(Z)
+        dZ = self._relu(Z)
         dZ[dZ > 0] = 1
         return dZ
 
