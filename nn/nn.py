@@ -562,7 +562,7 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
 
-        dA = (-2 / (y.shape[0] * y.shape[1]))(y - y_hat)
+        dA = (-2 / (y.shape[0] * y.shape[1])) * (y - y_hat)
 
         return dA
 
