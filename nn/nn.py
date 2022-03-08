@@ -318,7 +318,7 @@ class NeuralNetwork:
                 training_losses.append(self._loss_function(y_train, training_output, self._loss_func)) #record training and validation losses
                 validation_losses.append(self._loss_function(y_val, val_output, self._loss_func))
 
-                grad_dict = self.backprop(y_train, training_output) #backward pass
+                grad_dict = self.backprop(y_train, training_output, training_cache) #backward pass
                 self._update_params(grad_dict) #update weights and biases
 
             per_epoch_loss_train.append(np.mean(np.array(training_losses)))
