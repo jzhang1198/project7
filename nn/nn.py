@@ -385,16 +385,8 @@ class NeuralNetwork:
             nl_transform: ArrayLike
                 Activation function output.
         """
-
-        A = np.zeros(len(Z))
-
-        for i in range(0,len(Z)):
-            if Z[i] >= 0:
-                A[i] == Z[i]
-
-            elif Z[i] < 0:
-                A[i] == 0.01 * Z[i]
-        return A
+        nl_transform = np.maximum(0,Z)
+        return nl_transform
 
     def _activation_backprop(self, Z: ArrayLike, activation: str) -> ArrayLike:
         """
@@ -447,7 +439,10 @@ class NeuralNetwork:
             dZ: ArrayLike
                 Partial derivative of current layer Z matrix.
         """
-        pass
+
+        dZ = relu(Z)
+        dZ[dZ > 0] = 1
+        return dZ 
 
     def _loss_function(self, y: ArrayLike, y_hat: ArrayLike, loss_fun: str) -> float:
         """
