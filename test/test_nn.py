@@ -34,7 +34,7 @@ def load_test_data(split_percent=None):
     digits = load_digits()
     y = digits['target']
     X = digits['data']
-    return X.T, y.T
+    return X.T, np.array([y])
 
     if split_percent is not None:
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=split_percent, random_state=42)

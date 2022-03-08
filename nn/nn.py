@@ -112,7 +112,7 @@ class NeuralNetwork:
 
         Args:
             X: ArrayLike
-                Input matrix with shape [batch_size, features].
+                Input matrix with shape [features, batch_size].
 
         Returns:
             output: ArrayLike
@@ -291,13 +291,13 @@ class NeuralNetwork:
             #Shuffle training set
             shuffled_indices = np.linspace(0, X_train.shape[1]-1, X_train.shape[1])
             np.random.shuffle(shuffled_indices)
-            X_train = np.array([X_train[:, int(i)] for i in shuffled_indices])
-            y_train = np.array([y_train[:, int(i)] for i in shuffled_indices])
+            X_train = np.array([X_train[:, int(i)] for i in shuffled_indices]).T
+            y_train = np.array([y_train[:, int(i)] for i in shuffled_indices]).T
 
             #Split training set into batches
             num_batches = int(X_train.shape[1]/self._batch_size) + 1
             X_batch = [i.T for i in np.array_split(X_train.T, num_batches)]
-            y_batch = [i.T for i in np.array_split(y_train, num_batches)]
+            y_batch = [i.T for i in np.array_split(y_train.T, num_batches)]
 
             #Generate empty lists to hold losses for batches
             training_losses = []
