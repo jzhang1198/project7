@@ -82,7 +82,8 @@ def test_forward_and_single_forward_and_predict():
             b = b_curr[j]
             for k in range(0, A_prev.shape[1]):
                 assert np.dot(W_curr[j, :], A_prev[:, k]) + b - Z_curr[j,k] < 10e-8
-    A_prev = A_curr
+                
+        A_prev = A_curr
 
 def test_backprop_and_single_backprop():
     X, y = load_test_data() #load dataset
