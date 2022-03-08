@@ -442,7 +442,7 @@ class NeuralNetwork:
 
         dZ = relu(Z)
         dZ[dZ > 0] = 1
-        return dZ 
+        return dZ
 
     def _loss_function(self, y: ArrayLike, y_hat: ArrayLike, loss_fun: str) -> float:
         """

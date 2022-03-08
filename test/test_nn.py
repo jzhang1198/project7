@@ -4,6 +4,7 @@
 import pytest
 from nn import NeuralNetwork
 from numpy.typing import ArrayLike
+import numpy as np
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
 
@@ -49,7 +50,7 @@ def instantiate_nn(lr: float, batch_size: int, epochs: int, loss_function: str):
     """
     Helper function to instantiate a NeuralNetwork object for unit testing.
     """
-    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'}, {'input_dim': 16, 'output_dim': 64, 'activation:': 'sigmoid'}]
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'}, {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
     seed = 1
     return NeuralNetwork(nn_arch, lr, seed, batch_size, epochs, loss_function)
 
