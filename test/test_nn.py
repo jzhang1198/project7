@@ -42,8 +42,8 @@ def load_test_data(split_percent=None):
         #Reshape dataset to fit convention used in implementation of neural net
         X_train = X_train.T
         X_val = X_val.T
-        y_train = np.array([y_train]).T
-        y_val = np.array([y_val]).T
+        y_train = np.array([y_train])
+        y_val = np.array([y_val])
         return X_train, y_train, X_val, y_val
 
 def instantiate_nn(lr: float, batch_size: int, epochs: int, loss_function: str):
