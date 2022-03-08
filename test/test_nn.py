@@ -66,13 +66,13 @@ def test_forward_and_single_forward_and_predict():
     nn = instantiate_nn(lr, batch_size, 1, loss_function)
 
     A_prev = X
-    for i in range(0,len(self.arch)):
-        act_func_type = self.arch[i]['activation']
-        W_curr = self._param_dict['W' + str(i+1)]
-        b_curr = self._param_dict['b' + str(i+1)]
+    for i in range(0,len(nn.arch)):
+        act_func_type = nn.arch[i]['activation']
+        W_curr = nn._param_dict['W' + str(i+1)]
+        b_curr = nn._param_dict['b' + str(i+1)]
         assert W_curr.shape[0] == b_curr.shape[0] #double check that W and b are constructed correctly
 
-        Z_curr, A_curr = self._single_forward(W_curr, b_curr, A_prev, act_func_type)
+        Z_curr, A_curr = nn._single_forward(W_curr, b_curr, A_prev, act_func_type)
         assert A_curr.shape == Z_curr.shape #check that dimensions of A and Z are correct
         assert A_curr.shape[1] == X.shape[1] and A_curr.shape[0] == W_curr.shape[0]
 
@@ -96,42 +96,42 @@ def test_backprop_and_single_backprop():
     grad_dict = {}
 
     #compute the gradients for layer L
-    activation_curr = self.arch[-1]['activation']
-    Z_curr = cache['Z' + str(len(self.arch))]
-    delta_curr = np.multiply(self._loss_backprop(y, y_hat, self._loss_func), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
+    activation_curr = nn.arch[-1]['activation']
+    Z_curr = cache['Z' + str(len(nn.arch))]
+    delta_curr = np.multiply(nn._loss_backprop(y, y_hat, nn._loss_func), nn._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
     assert delta_curr.shape == y.shape and delta_curr.shape == y_hat.shape and delta_curr.shape == Z_curr.shape #check that the shape of delta is correct
     assert delta_curr.shape[1] == X.shape[1]
 
-    A_prev = cache['A' + str(len(self.arch)-1)]
+    A_prev = cache['A' + str(len(nn.arch)-1)]
 
     #update grad_dict
-    grad_dict['dW' + str(len(self.arch))] = np.dot(delta_curr, A_prev.transpose())
-    grad_dict['db' + str(len(self.arch))] = np.sum(delta_curr, axis=1, keepdims=True)
-    assert grad_dict['dW' + str(len(self.arch))].shape == self._param_dict['W' + str(len(self.arch))].shape #check that the shapes of gradients are correct
-    assert grad_dict['db' + str(len(self.arch))].shape == self._param_dict['b' + str(len(self.arch))].shape
+    grad_dict['dW' + str(len(nn.arch))] = np.dot(delta_curr, A_prev.transpose())
+    grad_dict['db' + str(len(nn.arch))] = np.sum(delta_curr, axis=1, keepdims=True)
+    assert grad_dict['dW' + str(len(nn.arch))].shape == nn._param_dict['W' + str(len(nn.arch))].shape #check that the shapes of gradients are correct
+    assert grad_dict['db' + str(len(nn.arch))].shape == nn._param_dict['b' + str(len(nn.arch))].shape
 
     delta_prev = delta_L
-    for i in range(0,len(self.arch)-1)[::-1]:
-        activation_curr = self.arch[i]['activation']
-        W_curr = self._param_dict['W' + str(i+2)]
-        b_curr = self._param_dict['b' + str(i+2)]
+    for i in range(0,len(nn.arch)-1)[::-1]:
+        activation_curr = nn.arch[i]['activation']
+        W_curr = nn._param_dict['W' + str(i+2)]
+        b_curr = nn._param_dict['b' + str(i+2)]
         Z_curr = cache['Z' + str(i+1)]
         A_prev = cache['A' + str(i)]
         assert W_curr.shape[1] == Z_curr.shape[1] #check that the shapes of cached matrices are correct
         assert b_curr.shape[0] == W_curr.shape[0]
 
-        delta_curr = self._compute_delta(W_curr, delta_prev, Z_curr, activation_curr) #compute delta
+        delta_curr = nn._compute_delta(W_curr, delta_prev, Z_curr, activation_curr) #compute delta
         assert delta_curr.shape == Z_curr.shape #check that the shape of delta is correct
 
         #compute gradients
-        dW_curr, db_curr = self._single_backprop(A_prev, delta_curr)
+        dW_curr, db_curr = nn._single_backprop(A_prev, delta_curr)
 
         #update grad_dict and delta
         grad_dict['dW' + str(i+1)] = dW_curr
         grad_dict['db' + str(i+1)] = db_curr
         delta_prev = delta_curr
-        assert grad_dict['dW' + str(i+1)].shape == self._param_dict['W' + str(i+1)].shape #check that the shape of gradients are correct
-        assert grad_dict['db' + str(i+1)].shape == self._param_dict['b' + str(i+1)].shape
+        assert grad_dict['dW' + str(i+1)].shape == nn._param_dict['W' + str(i+1)].shape #check that the shape of gradients are correct
+        assert grad_dict['db' + str(i+1)].shape == nn._param_dict['b' + str(i+1)].shape
 
 def test_binary_cross_entropy():
     assert 1 == 1
