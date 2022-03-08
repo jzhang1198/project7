@@ -123,12 +123,19 @@ class NeuralNetwork:
 
         cache = {}
 
+        # print(type(X))
         A_prev = X
+        # print(type(A_prev))
         cache['A0'] = A_prev
+        # print(type(cache['A0']))
         for i in range(0,len(self.arch)):
+            # print(i)
             act_func_type = self.arch[i]['activation'] #get W, b, and the activation function type for layer i+1
             W_curr = self._param_dict['W' + str(i+1)]
             b_curr = self._param_dict['b' + str(i+1)]
+
+            # print(type(A_prev), type(W_curr), type(b_curr))
+            # print(A_prev.shape,W_curr.shape, b_curr.shape)
 
             Z_curr, A_curr = self._single_forward(W_curr, b_curr, A_prev, act_func_type) #compute Z and A for layer i+1
             cache['A' + str(i+1)] = A_curr #cache output Z and A from layer i+1
@@ -304,11 +311,12 @@ class NeuralNetwork:
             validation_losses = []
 
             for X_train, y_train in zip(X_batch, y_batch):
-                training_output, training_cache = self.forward(X_batch) #forward pass of training and validation set
+                assert type(X_train) == np.ndarray
+                training_output, training_cache = self.forward(X_train) #forward pass of training and validation set
                 val_output, val_cache = self.forward(X_val)
 
                 training_losses.append(self._loss_function(y_train, training_output, self._loss_func)) #record training and validation losses
-                validation_losses.append(self._loss_function(y_val, val_output))
+                validation_losses.append(self._loss_function(y_val, val_output, self._loss_func))
 
                 grad_dict = backprop(y_train, training_output) #backward pass
                 self._update_params(grad_dict) #update weights and biases
