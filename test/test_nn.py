@@ -96,7 +96,7 @@ def test_backprop_and_single_backprop():
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'mse'
-    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+    nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X) #forward pass of X
 
@@ -149,7 +149,7 @@ def test_binary_cross_entropy():
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'bce'
-    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+    nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     y_hat, _ = nn.forward(X)
     loss = nn._loss_function(y, y_hat, nn._loss_func)
@@ -166,7 +166,7 @@ def test_binary_cross_entropy_backprop():
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'bce'
-    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+    nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X)
     dA = nn._loss_backprop(, y_hat, nn._loss_func)
@@ -177,11 +177,13 @@ def test_binary_cross_entropy_backprop():
 def test_mean_squared_error():
     X, y = load_test_data() #load dataset
 
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+    {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
     lr = 0.0001 #instantiate nn
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'mse'
-    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+    nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     y_hat, _ = nn.forward(X)
     loss = nn._loss_function(y, y_hat, nn._loss_func)
@@ -192,11 +194,13 @@ def test_mean_squared_error():
 def test_mean_squared_error_backprop():
     X, y = load_test_data() #load dataset
 
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+    {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
     lr = 0.0001 #instantiate nn
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'mse'
-    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+    nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X)
     dA = nn._loss_backprop(X, y_hat, nn._loss_func)
