@@ -149,7 +149,7 @@ def test_binary_cross_entropy():
     y_hat, _ = nn.forward(X)
     loss = nn._loss_function(y, y_hat, nn._loss_func)
 
-    assert type(loss) == float or type(loss) == np.float #check that data type of output is correct
+    assert type(loss) == float or type(loss) == np.float64 #check that data type of output is correct
     assert loss > 0 #check that loss is reasonable
 
 def test_binary_cross_entropy_backprop():
@@ -162,7 +162,7 @@ def test_binary_cross_entropy_backprop():
     nn = instantiate_nn(lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X)
-    dA = nn._loss_backprop(y, y_hat, self._loss_func)
+    dA = nn._loss_backprop(y, y_hat, nn._loss_func)
 
     assert dA.shape == y_hat.shape #check that the shape of bce backprop is reasonable
     assert dA.shape == y.shape
@@ -179,7 +179,7 @@ def test_mean_squared_error():
     y_hat, _ = nn.forward(X)
     loss = nn._loss_function(y, y_hat, nn._loss_func)
 
-    assert type(loss) == float or type(loss) == np.float #check that data type of output is correct
+    assert type(loss) == float or type(loss) == np.float64 #check that data type of output is correct
     assert loss > 0 #check that loss is reasonable
 
 def test_mean_squared_error_backprop():
@@ -192,7 +192,7 @@ def test_mean_squared_error_backprop():
     nn = instantiate_nn(lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X)
-    dA = nn._loss_backprop(y, y_hat, self._loss_func)
+    dA = nn._loss_backprop(y, y_hat, nn._loss_func)
 
     assert dA.shape == y_hat.shape #check that the shape of mse backprop is reasonable
     assert dA.shape == y.shape
