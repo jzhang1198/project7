@@ -206,6 +206,5 @@ def test_one_hot_encode():
         assert type(seq) == list
         assert set(list) = {0,1}
 
-
 def test_sample_seqs():
     assert 1 == 1
