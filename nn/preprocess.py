@@ -70,15 +70,13 @@ def sample_seqs(seqs, labels, seed=None):
     sampled_labels = [label for label in labels if label == 1]
 
     negative_indices = [index for index, element in enumerate(labels) if element == 0]
-    for i in range(0,no_positives):
+    for i in range(0,4):
         rand_index = np.random.randint(0,len(negative_indices)-1) #pick a random index for a negative example
-        assert negative_indices[rand_index] > 136
         rand_seq = seqs[negative_indices[rand_index]] #get sequence corresponding to index
-        rand_label = labels[rand_index] #get label corresponding to index
-        rand_pos = np.random.randint(0,len(rand_seq)-16) #pick a random starting position within negative seq
-        rand_17mer = rand_seq[rand_pos:rand_pos+17] #extract 17mer
 
-        sampled_seqs.append(rand_17mer)
-        sampled_labels.append(rand_label)
+        for i in range(0,len(rand_seq)-16):
+            sampled_seqs.append(rand_seq[i:i+17])
+            sampled_labels.append(0)
+            assert len(rand_seq[i:i+17]) == 17
 
     return sampled_seqs, sampled_labels

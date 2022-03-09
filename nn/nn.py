@@ -220,6 +220,8 @@ class NeuralNetwork:
         delta_L = np.multiply(self._loss_backprop(y, y_hat, self._loss_func), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
         A_prev = cache['A' + str(len(self.arch)-1)]
 
+        # assert self._activation_backprop(Z_curr, activation_curr) == y_hat
+
         #update grad_dict
         grad_dict['dW' + str(len(self.arch))] = np.dot(delta_L, A_prev.transpose())
         grad_dict['db' + str(len(self.arch))] = np.sum(delta_L, axis=1, keepdims=True)
@@ -261,13 +263,13 @@ class NeuralNetwork:
             grad = grad_dict[key] #get gradient and current weights
             current_weights = self._param_dict[key[1:]]
 
-            # self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
+            self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
 
-            if self._loss_func == 'bse':
-                self._param_dict[key[1:]] = current_weights + self._lr * grad #update weights
-
-            elif self._loss_func == 'mse':
-                self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
+            # if self._loss_func == 'bse':
+            #     self._param_dict[key[1:]] = current_weights + self._lr * grad #update weights
+            #
+            # elif self._loss_func == 'mse':
+            #     self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
 
         return
 
@@ -443,7 +445,7 @@ class NeuralNetwork:
                 Partial derivative of current layer Z matrix.
         """
 
-        dZ = self._sigmoid(Z) * (1 - self._sigmoid(Z))
+        dZ = np.multiply(self._sigmoid(Z), (1 - self._sigmoid(Z)))
         return dZ
 
     def _relu_backprop(self, Z: ArrayLike) -> ArrayLike:
@@ -526,14 +528,29 @@ class NeuralNetwork:
             loss: float
                 Average loss over mini-batch.
         """
+        # print(f'y: {y}')
+        # print(f'y_hat: {y_hat}')
 
-        loss = -1 * np.mean(np.multiply(y, np.log(y_hat)) + np.multiply(1 - y, np.log(1 - y_hat)))
+        # print(y.shape)
+        # print(y_hat.shape)
+        # print(np.dot(y.T, np.log(y_hat)))
+        # assert np.dot(y.T, np.log(y_hat)) == np.float64
+        # print(np.dot((1-y).T, np.log((1-y_hat))))
+        # assert np.dot((1-y).T, np.log((1-y_hat))) == np.float64
+
+        loss = (-1 / y.shape[1]) * (np.dot(y, np.log(y_hat).T) + np.dot((1-y), np.log((1-y_hat)).T))[0][0]
         assert type(loss) == np.float64
-        # print(loss, type(loss))
+        # loss = -1 * np.mean(np.multiply(y, np.log(y_hat)) + np.multiply(1 - y, np.log(1 - y_hat)))
+        # print('')
+        # print(f'term 1: {np.multiply(y, np.log(y_hat))}')
+        # print('')
+        # print(f'term 2: {np.multiply(1-y, np.log(1-y_hat))}')
+        # print('')
+        # print(loss)
 
         # sugondese = 0
-        # for i in range(0,len(y_hat)):
-        #     sugondese += (y[i] * np.log(y_hat[i])) + ((1 - y[i]) * np.log(1-y_hat[i]))
+        # for i in range(0,y_hat.shape[1]):
+        #     sugondese += (y[0,i] * np.log(y_hat[0,i])) + ((1 - y[0,i]) * np.log(1-y_hat[0,i]))
         #
         # assert abs(((-1 / y.shape[1]) * sugondese) - loss) < 10e-8
 
@@ -554,7 +571,16 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
 
-        dA = -1 * np.divide(y, y_hat) - np.divide(1 - y, 1 - y_hat) / y.shape[1]
+
+        dA = (y_hat - y) / (y_hat * (1 - y_hat))
+        # dA = (-1 / y.shape[1]) * (np.multiply(y, (1/y_hat)) - np.multiply((1 - y), (1/(1 - y_hat))))
+        # print(f'term 1: {np.divide(y, y_hat)}')
+        # print('')
+        # print(f'term 2: {np.divide(1-y, 1-y_hat)}')
+        # print('')
+        # print(dA)
+        # print('')
+
         return dA
 
     def _mean_squared_error(self, y: ArrayLike, y_hat: ArrayLike) -> float:
@@ -572,7 +598,8 @@ class NeuralNetwork:
                 Average loss of mini-batch.
         """
 
-        loss = np.mean(np.square(y - y_hat), axis=0)
+        # loss = np.mean(np.square(y - y_hat), axis=0)
+        loss = np.mean(np.square(y - y_hat))
         #assert type(loss) == np.float64
         return loss
 
