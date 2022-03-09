@@ -292,8 +292,11 @@ class NeuralNetwork:
         per_epoch_loss_train = []
         per_epoch_loss_val = []
 
+        assert type(epochs) == int
+        assert type(self._epochs) == int
         while epochs <= self._epochs:
             epochs += 1
+            assert type(epochs) == int
 
             #Shuffle training set
             shuffled_indices = np.linspace(0, X_train.shape[1]-1, X_train.shape[1])
@@ -552,7 +555,7 @@ class NeuralNetwork:
                 Average loss of mini-batch.
         """
 
-        loss = np.sum(np.sum(np.square(y - y_hat), axis=0) / y.shape[0]) / y.shape[1]
+        loss = np.mean(np.square(y - y_hat), axis=0)
         return loss
 
     def _mean_squared_error_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
@@ -570,7 +573,7 @@ class NeuralNetwork:
                 partial derivative of loss with respect to A matrix.
         """
 
-        dA = (-2 / (y.shape[0] * y.shape[1])) * (y - y_hat)
+        dA = (-2 / (y.size)) * (y - y_hat)
 
         return dA
 
