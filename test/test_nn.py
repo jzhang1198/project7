@@ -47,11 +47,10 @@ def load_test_data(split_percent=None):
         y_val = np.array([y_val])
         return X_train, y_train, X_val, y_val
 
-def instantiate_nn(lr: float, batch_size: int, epochs: int, loss_function: str):
+def instantiate_nn(nn_arch, lr: float, batch_size: int, epochs: int, loss_function: str):
     """
     Helper function to instantiate a NeuralNetwork object for unit testing.
     """
-    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'}, {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
     seed = 1
     return NeuralNetwork(nn_arch, lr, seed, batch_size, epochs, loss_function)
 
@@ -61,11 +60,13 @@ def test_forward_and_single_forward_and_predict():
     """
     X, y = load_test_data() #load dataset
 
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+    {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
     lr = 0.0001
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'mse'
-    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+    nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     A_prev = X
     for i in range(0,len(nn.arch)):
@@ -89,6 +90,8 @@ def test_forward_and_single_forward_and_predict():
 def test_backprop_and_single_backprop():
     X, y = load_test_data() #load dataset
 
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+    {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
     lr = 0.0001 #instantiate nn
     batch_size = X.shape[1]
     epochs = 1
@@ -140,6 +143,8 @@ def test_backprop_and_single_backprop():
 def test_binary_cross_entropy():
     X, y = load_test_data() #load dataset
 
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+    {'input_dim': 16, 'output_dim': 1, 'activation': 'sigmoid'}]
     lr = 0.0001 #instantiate nn
     batch_size = X.shape[1]
     epochs = 1
@@ -155,6 +160,8 @@ def test_binary_cross_entropy():
 def test_binary_cross_entropy_backprop():
     X, y = load_test_data() #load dataset
 
+    nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
+    {'input_dim': 16, 'output_dim': 1, 'activation': 'sigmoid'}]
     lr = 0.0001 #instantiate nn
     batch_size = X.shape[1]
     epochs = 1
@@ -162,7 +169,7 @@ def test_binary_cross_entropy_backprop():
     nn = instantiate_nn(lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X)
-    dA = nn._loss_backprop(y, y_hat, nn._loss_func)
+    dA = nn._loss_backprop(, y_hat, nn._loss_func)
 
     assert dA.shape == y_hat.shape #check that the shape of bce backprop is reasonable
     assert dA.shape == y.shape
@@ -192,7 +199,7 @@ def test_mean_squared_error_backprop():
     nn = instantiate_nn(lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X)
-    dA = nn._loss_backprop(y, y_hat, nn._loss_func)
+    dA = nn._loss_backprop(X, y_hat, nn._loss_func)
 
     assert dA.shape == y_hat.shape #check that the shape of mse backprop is reasonable
     assert dA.shape == y.shape
@@ -204,7 +211,7 @@ def test_one_hot_encode():
     assert type(encodings) == list #check that encodings were constructed correctly
     for seq in encodings:
         assert type(seq) == list
-        assert set(list) == {0,1}
+        assert set(seq) == {0,1}
 
 def test_sample_seqs():
     assert 1 == 1
