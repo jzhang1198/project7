@@ -3,6 +3,7 @@
 # Import necessary dependencies here
 import pytest
 from nn import NeuralNetwork
+from nn import preprocess
 from numpy.typing import ArrayLike
 import numpy as np
 from sklearn.datasets import load_digits
@@ -196,9 +197,14 @@ def test_mean_squared_error_backprop():
     assert dA.shape == y_hat.shape #check that the shape of mse backprop is reasonable
     assert dA.shape == y.shape
 
-
 def test_one_hot_encode():
-    assert 1 == 1
+    seq_arr = ['ATCG','AAAA','TTTT','CCCC','GGGG']
+    encodings = preprocess.one_hot_encode_seqs(seq_arr)
+
+    assert type(encodings) == list #check that encodings were constructed correctly
+    for seq in encodings:
+        assert type(seq) == list
+        assert set(list) = {0,1}
 
 
 def test_sample_seqs():

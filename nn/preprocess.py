@@ -43,11 +43,6 @@ def one_hot_encode_seqs(seq_arr: List[str]) -> ArrayLike:
 
     return encodings
 
-
-# def sample_seqs(
-#         seqs: List[str]
-#         labels: List[bool]) -> Tuple[List[seq], List[bool]]:
-
 def sample_seqs(seqs, labels):
     """
     This function should sample your sequences to account for class imbalance.
@@ -56,13 +51,29 @@ def sample_seqs(seqs, labels):
     Args:
         seqs: List[str]
             List of all sequences.
-        labels: List[bool]
-            List of positive/negative labels
+        labels: List[int]
+            List of positive/negative labels, where a label of 1 indicates a positive example and a label of 0 indicates a negative example
 
     Returns:
         sampled_seqs: List[str]
             List of sampled sequences which reflect a balanced class size
-        sampled_labels: List[bool]
+        sampled_labels: List[int]
             List of labels for the sampled sequences
     """
-    pass
+    no_positives = labels.count(1)
+
+    sampled_seqs = [seq for seq in seqs if labels[seqs.index(seq)] == 1]
+    sampled_lables = [label for label in labels if label == 1]
+
+    negative_indices = [index for index, element in enumerate(seqs) if element == 0]
+    for i in range(0,no_positives):
+        rand_index = np.random.randint(0,len(negative_indices)) #pick a random index for a negative example
+        rand_seq = seqs[negative_indices[rand_index]] #get sequence corresponding to index
+        rand_label = label[rand_index] #get label corresponding to index
+        rand_pos = np.random.randint(0,len(rand_seq)-16) #pick a random starting position within negative seq
+        rand_17mer = rand_seq[rand_pos:rand_pos+17] #extract 17mer
+
+        sampled_seqs.append(rand_17mer)
+        sampled_seqs.append(rand_label)
+
+    return sampled_seqs, sampled_labels
