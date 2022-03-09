@@ -265,12 +265,6 @@ class NeuralNetwork:
 
             self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
 
-            # if self._loss_func == 'bse':
-            #     self._param_dict[key[1:]] = current_weights + self._lr * grad #update weights
-            #
-            # elif self._loss_func == 'mse':
-            #     self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
-
         return
 
     def fit(self,
@@ -325,13 +319,6 @@ class NeuralNetwork:
 
                 training_losses.append(self._loss_function(y_train, training_output, self._loss_func)) #record training and validation losses
                 validation_losses.append(self._loss_function(y_val, val_output, self._loss_func))
-
-                # print(self._loss_function(y_train, training_output, self._loss_func).shape)
-                # print(self._loss_function(y_val, val_output, self._loss_func).shape)
-                #
-                # assert type(self._loss_function(y_train, training_output, self._loss_func)) == np.float64
-                # assert type(self._loss_function(y_val, val_output, self._loss_func)) == np.float64
-
 
                 grad_dict = self.backprop(y_train, training_output, training_cache) #backward pass
                 self._update_params(grad_dict) #update weights and biases
@@ -528,31 +515,8 @@ class NeuralNetwork:
             loss: float
                 Average loss over mini-batch.
         """
-        # print(f'y: {y}')
-        # print(f'y_hat: {y_hat}')
-
-        # print(y.shape)
-        # print(y_hat.shape)
-        # print(np.dot(y.T, np.log(y_hat)))
-        # assert np.dot(y.T, np.log(y_hat)) == np.float64
-        # print(np.dot((1-y).T, np.log((1-y_hat))))
-        # assert np.dot((1-y).T, np.log((1-y_hat))) == np.float64
 
         loss = (-1 / y.shape[1]) * (np.dot(y, np.log(y_hat).T) + np.dot((1-y), np.log((1-y_hat)).T))[0][0]
-        assert type(loss) == np.float64
-        # loss = -1 * np.mean(np.multiply(y, np.log(y_hat)) + np.multiply(1 - y, np.log(1 - y_hat)))
-        # print('')
-        # print(f'term 1: {np.multiply(y, np.log(y_hat))}')
-        # print('')
-        # print(f'term 2: {np.multiply(1-y, np.log(1-y_hat))}')
-        # print('')
-        # print(loss)
-
-        # sugondese = 0
-        # for i in range(0,y_hat.shape[1]):
-        #     sugondese += (y[0,i] * np.log(y_hat[0,i])) + ((1 - y[0,i]) * np.log(1-y_hat[0,i]))
-        #
-        # assert abs(((-1 / y.shape[1]) * sugondese) - loss) < 10e-8
 
         return loss
 
@@ -573,13 +537,6 @@ class NeuralNetwork:
 
 
         dA = (y_hat - y) / (y_hat * (1 - y_hat))
-        # dA = (-1 / y.shape[1]) * (np.multiply(y, (1/y_hat)) - np.multiply((1 - y), (1/(1 - y_hat))))
-        # print(f'term 1: {np.divide(y, y_hat)}')
-        # print('')
-        # print(f'term 2: {np.divide(1-y, 1-y_hat)}')
-        # print('')
-        # print(dA)
-        # print('')
 
         return dA
 
@@ -597,10 +554,7 @@ class NeuralNetwork:
             loss: float
                 Average loss of mini-batch.
         """
-
-        # loss = np.mean(np.square(y - y_hat), axis=0)
         loss = np.mean(np.square(y - y_hat))
-        #assert type(loss) == np.float64
         return loss
 
     def _mean_squared_error_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
