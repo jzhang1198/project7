@@ -260,7 +260,14 @@ class NeuralNetwork:
         for key in grad_dict:
             grad = grad_dict[key] #get gradient and current weights
             current_weights = self._param_dict[key[1:]]
-            self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
+
+            # self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
+
+            if self._loss_func == 'bse':
+                self._param_dict[key[1:]] = current_weights + self._lr * grad #update weights
+
+            elif self._loss_func == 'mse':
+                self._param_dict[key[1:]] = current_weights - self._lr * grad #update weights
 
         return
 
@@ -292,11 +299,8 @@ class NeuralNetwork:
         per_epoch_loss_train = []
         per_epoch_loss_val = []
 
-        assert type(epochs) == int
-        assert type(self._epochs) == int
         while epochs <= self._epochs:
             epochs += 1
-            assert type(epochs) == int
 
             #Shuffle training set
             shuffled_indices = np.linspace(0, X_train.shape[1]-1, X_train.shape[1])
@@ -314,12 +318,18 @@ class NeuralNetwork:
             validation_losses = []
 
             for X_train, y_train in zip(X_batch, y_batch):
-                assert type(X_train) == np.ndarray
                 training_output, training_cache = self.forward(X_train) #forward pass of training and validation set
                 val_output, val_cache = self.forward(X_val)
 
                 training_losses.append(self._loss_function(y_train, training_output, self._loss_func)) #record training and validation losses
                 validation_losses.append(self._loss_function(y_val, val_output, self._loss_func))
+
+                # print(self._loss_function(y_train, training_output, self._loss_func).shape)
+                # print(self._loss_function(y_val, val_output, self._loss_func).shape)
+                #
+                # assert type(self._loss_function(y_train, training_output, self._loss_func)) == np.float64
+                # assert type(self._loss_function(y_val, val_output, self._loss_func)) == np.float64
+
 
                 grad_dict = self.backprop(y_train, training_output, training_cache) #backward pass
                 self._update_params(grad_dict) #update weights and biases
@@ -517,7 +527,16 @@ class NeuralNetwork:
                 Average loss over mini-batch.
         """
 
-        loss = -1 * np.sum(np.multiply(y, np.log(y_hat)) + np.multiply(1 - y, np.log(1 - y_hat))) / y.shape[1]
+        loss = -1 * np.mean(np.multiply(y, np.log(y_hat)) + np.multiply(1 - y, np.log(1 - y_hat)))
+        assert type(loss) == np.float64
+        # print(loss, type(loss))
+
+        # sugondese = 0
+        # for i in range(0,len(y_hat)):
+        #     sugondese += (y[i] * np.log(y_hat[i])) + ((1 - y[i]) * np.log(1-y_hat[i]))
+        #
+        # assert abs(((-1 / y.shape[1]) * sugondese) - loss) < 10e-8
+
         return loss
 
     def _binary_cross_entropy_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
@@ -554,6 +573,7 @@ class NeuralNetwork:
         """
 
         loss = np.mean(np.square(y - y_hat), axis=0)
+        #assert type(loss) == np.float64
         return loss
 
     def _mean_squared_error_backprop(self, y: ArrayLike, y_hat: ArrayLike) -> ArrayLike:
