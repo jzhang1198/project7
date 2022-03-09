@@ -204,7 +204,7 @@ def test_one_hot_encode():
     assert type(encodings) == list #check that encodings were constructed correctly
     for seq in encodings:
         assert type(seq) == list
-        assert set(list) = {0,1}
+        assert set(list) == {0,1}
 
 def test_sample_seqs():
     assert 1 == 1
