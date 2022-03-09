@@ -169,7 +169,7 @@ def test_binary_cross_entropy_backprop():
     nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X)
-    dA = nn._loss_backprop(, y_hat, nn._loss_func)
+    dA = nn._loss_backprop(y, y_hat, nn._loss_func)
 
     assert dA.shape == y_hat.shape #check that the shape of bce backprop is reasonable
     assert dA.shape == y.shape
