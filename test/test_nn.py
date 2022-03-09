@@ -82,7 +82,7 @@ def test_forward_and_single_forward_and_predict():
             b = b_curr[j]
             for k in range(0, A_prev.shape[1]):
                 assert np.dot(W_curr[j, :], A_prev[:, k]) + b - Z_curr[j,k] < 10e-8
-                
+
         A_prev = A_curr
 
 def test_backprop_and_single_backprop():
@@ -137,16 +137,64 @@ def test_backprop_and_single_backprop():
         assert grad_dict['db' + str(i+1)].shape == nn._param_dict['b' + str(i+1)].shape
 
 def test_binary_cross_entropy():
-    assert 1 == 1
+    X, y = load_test_data() #load dataset
+
+    lr = 0.0001 #instantiate nn
+    batch_size = X.shape[1]
+    epochs = 1
+    loss_function = 'bce'
+    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+
+    y_hat, _ = nn.forward(X)
+    loss = nn._loss_function(y, y_hat, nn._loss_func)
+
+    assert type(loss) == float or type(loss) == np.float #check that data type of output is correct
+    assert loss > 0 #check that loss is reasonable
 
 def test_binary_cross_entropy_backprop():
-    assert 1 == 1
+    X, y = load_test_data() #load dataset
+
+    lr = 0.0001 #instantiate nn
+    batch_size = X.shape[1]
+    epochs = 1
+    loss_function = 'bce'
+    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+
+    y_hat, cache = nn.forward(X)
+    dA = nn._loss_backprop(y, y_hat, self._loss_func)
+
+    assert dA.shape == y_hat.shape #check that the shape of bce backprop is reasonable
+    assert dA.shape == y.shape
 
 def test_mean_squared_error():
-    assert 1 == 1
+    X, y = load_test_data() #load dataset
+
+    lr = 0.0001 #instantiate nn
+    batch_size = X.shape[1]
+    epochs = 1
+    loss_function = 'mse'
+    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+
+    y_hat, _ = nn.forward(X)
+    loss = nn._loss_function(y, y_hat, nn._loss_func)
+
+    assert type(loss) == float or type(loss) == np.float #check that data type of output is correct
+    assert loss > 0 #check that loss is reasonable
 
 def test_mean_squared_error_backprop():
-    assert 1 == 1
+    X, y = load_test_data() #load dataset
+
+    lr = 0.0001 #instantiate nn
+    batch_size = X.shape[1]
+    epochs = 1
+    loss_function = 'mse'
+    nn = instantiate_nn(lr, batch_size, 1, loss_function)
+
+    y_hat, cache = nn.forward(X)
+    dA = nn._loss_backprop(y, y_hat, self._loss_func)
+
+    assert dA.shape == y_hat.shape #check that the shape of mse backprop is reasonable
+    assert dA.shape == y.shape
 
 
 def test_one_hot_encode():

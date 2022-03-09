@@ -329,8 +329,6 @@ class NeuralNetwork:
 
         return per_epoch_loss_train, per_epoch_loss_val
 
-
-
     def predict(self, X: ArrayLike) -> ArrayLike:
         """
         This function returns the prediction of the neural network model.
