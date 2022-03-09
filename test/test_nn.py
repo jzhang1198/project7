@@ -35,6 +35,8 @@ def load_test_data(split_percent=None):
     digits = load_digits()
     y = digits['target']
     X = digits['data']
+
+
     return X.T, np.array([y])
 
     if split_percent is not None:
@@ -152,6 +154,7 @@ def test_binary_cross_entropy():
     nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     y_hat, _ = nn.forward(X)
+    y = nn._sigmoid(y) #map y to floats between 0 and 1
     loss = nn._loss_function(y, y_hat, nn._loss_func)
 
     assert type(loss) == float or type(loss) == np.float64 #check that data type of output is correct
@@ -169,6 +172,7 @@ def test_binary_cross_entropy_backprop():
     nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
     y_hat, cache = nn.forward(X)
+    y = nn._sigmoid(y) #map y to floats between 0 and 1
     dA = nn._loss_backprop(y, y_hat, nn._loss_func)
 
     assert dA.shape == y_hat.shape #check that the shape of bce backprop is reasonable
@@ -206,7 +210,7 @@ def test_mean_squared_error_backprop():
     dA = nn._loss_backprop(X, y_hat, nn._loss_func)
 
     assert dA.shape == y_hat.shape #check that the shape of mse backprop is reasonable
-    assert dA.shape == y.shape
+    assert dA.shape == X.shape
 
 def test_one_hot_encode():
     seq_arr = ['ATCG','AAAA','TTTT','CCCC','GGGG']
