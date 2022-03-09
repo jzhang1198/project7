@@ -102,8 +102,8 @@ class NeuralNetwork:
                 Current layer linear transformed matrix.
         """
 
-        Z_curr = np.dot(W_curr, A_prev) + b_curr
-        A_curr = self._activation_function(Z_curr, activation)
+        Z_curr = np.dot(W_curr, A_prev) + b_curr #compute linear transform of A_prev
+        A_curr = self._activation_function(Z_curr, activation) #compute activation of linear transform
         return Z_curr, A_curr
 
     def forward(self, X: ArrayLike) -> Tuple[ArrayLike, Dict[str, ArrayLike]]:
@@ -123,19 +123,12 @@ class NeuralNetwork:
 
         cache = {}
 
-        # print(type(X))
         A_prev = X
-        # print(type(A_prev))
         cache['A0'] = A_prev
-        # print(type(cache['A0']))
         for i in range(0,len(self.arch)):
-            # print(i)
             act_func_type = self.arch[i]['activation'] #get W, b, and the activation function type for layer i+1
             W_curr = self._param_dict['W' + str(i+1)]
             b_curr = self._param_dict['b' + str(i+1)]
-
-            # print(type(A_prev), type(W_curr), type(b_curr))
-            # print(A_prev.shape,W_curr.shape, b_curr.shape)
 
             Z_curr, A_curr = self._single_forward(W_curr, b_curr, A_prev, act_func_type) #compute Z and A for layer i+1
             cache['A' + str(i+1)] = A_curr #cache output Z and A from layer i+1
@@ -171,7 +164,7 @@ class NeuralNetwork:
         dW_curr = np.dot(delta_curr, A_prev.transpose())
         return dW_curr, db_curr
 
-    def _compute_delta(self, W_curr: ArrayLike, delta_prev: ArrayLike, Z_curr: ArrayLike, activation_curr: str):
+    def _compute_delta(self, W_curr: ArrayLike, delta_prev: ArrayLike, Z_curr: ArrayLike, activation_curr: str) -> ArrayLike:
         """
         Computes delta, as defined in https://sudeepraja.github.io/Neural/, for the current layer.
 
@@ -194,7 +187,7 @@ class NeuralNetwork:
         delta = np.multiply(np.dot(W_curr.transpose(), delta_prev), dZ) #for layer i, compute the product of the dJ/dZi+1, dZi+1/dAi, and dAi/dZi
         return delta
 
-    def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]):
+    def backprop(self, y: ArrayLike, y_hat: ArrayLike, cache: Dict[str, ArrayLike]) -> Dict[str, ArrayLike]:
         """
         This method is responsible for the backprop of the whole fully connected neural network.
 
@@ -220,14 +213,13 @@ class NeuralNetwork:
         delta_L = np.multiply(self._loss_backprop(y, y_hat, self._loss_func), self._activation_backprop(Z_curr, activation_curr)) #compute the product of dJ/dAL and dAL/dZl
         A_prev = cache['A' + str(len(self.arch)-1)]
 
-        # assert self._activation_backprop(Z_curr, activation_curr) == y_hat
-
         #update grad_dict
         grad_dict['dW' + str(len(self.arch))] = np.dot(delta_L, A_prev.transpose())
         grad_dict['db' + str(len(self.arch))] = np.sum(delta_L, axis=1, keepdims=True)
 
         delta_prev = delta_L
         for i in range(0,len(self.arch)-1)[::-1]:
+            #Fetch relevant weights, biases, linear transformed matrix, and activation matrix
             activation_curr = self.arch[i]['activation']
             W_curr = self._param_dict['W' + str(i+2)]
             b_curr = self._param_dict['b' + str(i+2)]
@@ -291,6 +283,7 @@ class NeuralNetwork:
             per_epoch_loss_val: List[float]
                 List of per epoch loss for validation set.
         """
+        #initialize output lists
         epochs = 0
         per_epoch_loss_train = []
         per_epoch_loss_val = []
@@ -323,7 +316,7 @@ class NeuralNetwork:
                 grad_dict = self.backprop(y_train, training_output, training_cache) #backward pass
                 self._update_params(grad_dict) #update weights and biases
 
-            per_epoch_loss_train.append(np.mean(np.array(training_losses)))
+            per_epoch_loss_train.append(np.mean(np.array(training_losses))) #update losses
             per_epoch_loss_val.append(np.mean(np.array(validation_losses)))
 
         return per_epoch_loss_train, per_epoch_loss_val
@@ -419,7 +412,7 @@ class NeuralNetwork:
 
         return dZ
 
-    def _sigmoid_backprop(self, Z: ArrayLike):
+    def _sigmoid_backprop(self, Z: ArrayLike) -> ArrayLike:
         """
         Sigmoid derivative for backprop.
 
