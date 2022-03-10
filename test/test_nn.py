@@ -229,11 +229,10 @@ def test_one_hot_encode():
         assert set(seq) == {0,1}
 
 def test_sample_seqs():
-    #Process data for training
     pos_file = 'data/rap1-lieb-positives.txt'
     neg_file = 'data/yeast-upstream-1k-negative.fa'
 
-    #Load sequences and labels
+    #load sequences and labels
     pos_seqs = io.read_text_file(pos_file)
     pos_labels = [1] * len(pos_seqs)
     neg_seqs = io.read_fasta_file(neg_file)
@@ -241,7 +240,7 @@ def test_sample_seqs():
     seqs = pos_seqs + neg_seqs
     labels = pos_labels + neg_labels
 
-    #Sample sequences
+    #sample sequences
     seed = 1 #set seed for reproducibility
     sampled_seqs, sampled_labels = preprocess.sample_seqs(seqs,labels,1)
 
