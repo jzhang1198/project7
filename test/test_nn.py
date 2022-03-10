@@ -8,6 +8,7 @@ from numpy.typing import ArrayLike
 import numpy as np
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
+from nn import io
 
 # TODO: Write your test functions and associated docstrings below.
 
@@ -228,4 +229,24 @@ def test_one_hot_encode():
         assert set(seq) == {0,1}
 
 def test_sample_seqs():
-    assert 1 == 1
+    #Process data for training
+    pos_file = 'data/rap1-lieb-positives.txt'
+    neg_file = 'data/yeast-upstream-1k-negative.fa'
+
+    #Load sequences and labels
+    pos_seqs = io.read_text_file(pos_file)
+    pos_labels = [1] * len(pos_seqs)
+    neg_seqs = io.read_fasta_file(neg_file)
+    neg_labels = [0] * len(neg_seqs)
+    seqs = pos_seqs + neg_seqs
+    labels = pos_labels + neg_labels
+
+    #Sample sequences
+    seed = 1 #set seed for reproducibility
+    sampled_seqs, sampled_labels = preprocess.sample_seqs(seqs,labels,1)
+
+    #check that sampled_seqs and sampled_labels were constructed correctly
+    assert set(sampled_labels) == {0,1}
+    assert len([i for i in sampled_labels if i == 0]) == len([i for i in sampled_labels if i == 1])
+    assert type(sampled_labels) == list
+    assert type(sampled_seqs) == list
