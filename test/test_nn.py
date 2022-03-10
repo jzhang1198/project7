@@ -35,8 +35,6 @@ def load_test_data(split_percent=None):
     digits = load_digits()
     y = digits['target']
     X = digits['data']
-
-
     return X.T, np.array([y])
 
     if split_percent is not None:
@@ -53,7 +51,7 @@ def instantiate_nn(nn_arch, lr: float, batch_size: int, epochs: int, loss_functi
     """
     Helper function to instantiate a NeuralNetwork object for unit testing.
     """
-    seed = 1
+    seed = 1 #set seed for reproducibility
     return NeuralNetwork(nn_arch, lr, seed, batch_size, epochs, loss_function)
 
 def test_forward_and_single_forward_and_predict():
@@ -62,6 +60,7 @@ def test_forward_and_single_forward_and_predict():
     """
     X, y = load_test_data() #load dataset
 
+    #instantiate a NeuralNetwork object
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
     {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
     lr = 0.0001
@@ -70,6 +69,7 @@ def test_forward_and_single_forward_and_predict():
     loss_function = 'mse'
     nn = instantiate_nn(nn_arch, lr, batch_size, 1, loss_function)
 
+    #copy of source code from forward method
     A_prev = X
     for i in range(0,len(nn.arch)):
         act_func_type = nn.arch[i]['activation']
@@ -92,9 +92,10 @@ def test_forward_and_single_forward_and_predict():
 def test_backprop_and_single_backprop():
     X, y = load_test_data() #load dataset
 
+    #instantiate a NeuralNetwork object
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
     {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
-    lr = 0.0001 #instantiate nn
+    lr = 0.0001
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'mse'
@@ -102,6 +103,7 @@ def test_backprop_and_single_backprop():
 
     y_hat, cache = nn.forward(X) #forward pass of X
 
+    #copy of source code from backprop method:
     grad_dict = {}
 
     #compute the gradients for layer L
@@ -145,9 +147,10 @@ def test_backprop_and_single_backprop():
 def test_binary_cross_entropy():
     X, y = load_test_data() #load dataset
 
+    #instantiate a NeuralNetwork object
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
     {'input_dim': 16, 'output_dim': 1, 'activation': 'sigmoid'}]
-    lr = 0.0001 #instantiate nn
+    lr = 0.0001
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'bce'
@@ -163,9 +166,10 @@ def test_binary_cross_entropy():
 def test_binary_cross_entropy_backprop():
     X, y = load_test_data() #load dataset
 
+    #instantiate a NeuralNetwork object
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
     {'input_dim': 16, 'output_dim': 1, 'activation': 'sigmoid'}]
-    lr = 0.0001 #instantiate nn
+    lr = 0.0001
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'bce'
@@ -181,9 +185,10 @@ def test_binary_cross_entropy_backprop():
 def test_mean_squared_error():
     X, y = load_test_data() #load dataset
 
+    #instantiate a NeuralNetwork object
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
     {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
-    lr = 0.0001 #instantiate nn
+    lr = 0.0001
     batch_size = X.shape[1]
     epochs = 1
     loss_function = 'mse'
@@ -198,6 +203,7 @@ def test_mean_squared_error():
 def test_mean_squared_error_backprop():
     X, y = load_test_data() #load dataset
 
+    #instantiate a NeuralNetwork object
     nn_arch = [{'input_dim': 64, 'output_dim': 16, 'activation': 'relu'},
     {'input_dim': 16, 'output_dim': 64, 'activation': 'sigmoid'}]
     lr = 0.0001 #instantiate nn
@@ -213,7 +219,7 @@ def test_mean_squared_error_backprop():
     assert dA.shape == X.shape
 
 def test_one_hot_encode():
-    seq_arr = ['ATCG','AAAA','TTTT','CCCC','GGGG']
+    seq_arr = ['ATCG','AAAA','TTTT','CCCC','GGGG'] #generate test sequences
     encodings = preprocess.one_hot_encode_seqs(seq_arr)
 
     assert type(encodings) == list #check that encodings were constructed correctly

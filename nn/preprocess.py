@@ -61,22 +61,52 @@ def sample_seqs(seqs, labels, seed=None):
             List of labels for the sampled sequences
     """
 
+    #initialize output lists
+    sampled_seqs = []
+    sampled_labels = []
+
     if seed is not None:
-        np.random.seed(seed)
+        np.random.seed(seed) #set random seed for reproducibility
 
-    no_positives = labels.count(1)
+    #get indices of positive and negative examples
+    positives = [index for index, element in enumerate(labels) if element == 1]
+    negatives = [index for index, element in enumerate(labels) if element == 0]
 
-    sampled_seqs = [seq for seq in seqs if labels[seqs.index(seq)] == 1]
-    sampled_labels = [label for label in labels if label == 1]
+    sample_size = 5000 #set sample size
+    iters = 0
+    while iters < (sample_size/2):
+        iters += 1
+        positive_ind = np.random.randint(0,len(positives)-1) #pick a random positive and negative example
+        negative_ind = np.random.randint(0,len(negatives)-1)
 
-    negative_indices = [index for index, element in enumerate(labels) if element == 0]
-    for i in range(0,4):
-        rand_index = np.random.randint(0,len(negative_indices)-1) #pick a random index for a negative example
-        rand_seq = seqs[negative_indices[rand_index]] #get sequence corresponding to index
+        positive_seq = seqs[positives[positive_ind]] #get positive sequence
+        negative_seq = seqs[negatives[negative_ind]] #pick a random 17mer in negative example
+        seqpos = np.random.randint(0,len(negative_seq)-16)
+        negative_seq = negative_seq[seqpos:seqpos+17]
+        assert len(negative_seq) == 17
 
-        for i in range(0,len(rand_seq)-16):
-            sampled_seqs.append(rand_seq[i:i+17])
-            sampled_labels.append(0)
-            assert len(rand_seq[i:i+17]) == 17
+        sampled_seqs.append(positive_seq)
+        sampled_seqs.append(negative_seq)
+        sampled_labels.append(1)
+        sampled_labels.append(0)
 
     return sampled_seqs, sampled_labels
+
+
+
+    # no_positives = labels.count(1)
+    #
+    # sampled_seqs = [seq for seq in seqs if labels[seqs.index(seq)] == 1]
+    # sampled_labels = [label for label in labels if label == 1]
+    #
+    # negative_indices = [index for index, element in enumerate(labels) if element == 0]
+    # for i in range(0,4):
+    #     rand_index = np.random.randint(0,len(negative_indices)-1) #pick a random index for a negative example
+    #     rand_seq = seqs[negative_indices[rand_index]] #get sequence corresponding to index
+    #
+    #     for i in range(0,len(rand_seq)-16):
+    #         sampled_seqs.append(rand_seq[i:i+17])
+    #         sampled_labels.append(0)
+    #         assert len(rand_seq[i:i+17]) == 17
+    #
+    # return sampled_seqs, sampled_labels
